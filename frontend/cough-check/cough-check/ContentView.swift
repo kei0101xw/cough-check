@@ -26,14 +26,20 @@ struct ContentView: View {
     private var home: some View {
         VStack(spacing: 0) {
             Spacer()
-            ViewThatFits {
-                HStack(spacing: 16) {
-                    Image(systemName: "waveform").font(.system(size: 48))
-                    Text("Cough Check").font(.system(size: 32, weight: .bold))
-                }
-                VStack(spacing: 16) {
-                    Image(systemName: "waveform").font(.system(size: 48))
-                    Text("Cough Check").font(.largeTitle.bold())
+            VStack(spacing: 15) {
+                Text("-咳の音から感染症リスクを判定するアプリ-")
+                    .font(.system(size: 13))
+                    .multilineTextAlignment(.center)
+                    .bold()
+                ViewThatFits {
+                    HStack(spacing: 7) {
+                        Image(systemName: "waveform").font(.system(size: 48))
+                        Text("Cough Check").font(.system(size: 32, weight: .bold))
+                    }
+                    VStack(spacing: 16) {
+                        Image(systemName: "waveform").font(.system(size: 48))
+                        Text("Cough Check").font(.largeTitle.bold())
+                    }
                 }
             }
             .foregroundStyle(.white)
@@ -41,7 +47,7 @@ struct ContentView: View {
             Spacer()
             panel {
                 VStack(spacing: 16) {
-                    action(session.isRequestingPermission ? "マイクを確認中…" : "感染症の可能性を判定する", icon: "mic.fill") {
+                    action(session.isRequestingPermission ? "マイクを確認中…" : "感染症リスクをチェックする", icon: "mic.fill") {
                         Task { await session.goToRecording() }
                     }
                     .disabled(session.isRequestingPermission)
@@ -61,12 +67,21 @@ struct ContentView: View {
             header("咳の録音", onBack: session.goHome, isBackDisabled: session.isRecording)
             ScrollView {
                 VStack(spacing: 24) {
-                    Text(session.isRecording ? "録音中" : "録音を開始してください")
-                        .font(.title2)
-                    Text(session.isRecording ? "咳の録音が終わったら、停止してください。" : "静かな場所で、スマートフォンに向かって\n咳を録音してください。")
-                        .font(.body)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
+                    // 両方の案内文の高さを確保し、録音開始時の位置ずれを防ぐ。
+                    ZStack(alignment: .top) {
+                        ForEach([false, true], id: \.self) { isRecording in
+                            VStack(spacing: 24) {
+                                Text(isRecording ? "録音中" : "録音を開始してください")
+                                    .font(.title2)
+                                Text(isRecording ? "咳の録音が終わったら、停止してください。" : "静かな場所で、スマートフォンに向かって\n咳を録音してください。")
+                                    .font(.body)
+                                    .foregroundStyle(.secondary)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .opacity(session.isRecording == isRecording ? 1 : 0)
+                            .accessibilityHidden(session.isRecording != isRecording)
+                        }
+                    }
                     CircularAudioVisualizer(
                         level: session.audioLevel,
                         isRecording: session.isRecording
@@ -74,6 +89,7 @@ struct ContentView: View {
                     if let start = session.startedAt, session.isRecording {
                         Text(start, style: .timer)
                             .font(.system(size: 32, weight: .medium, design: .monospaced))
+                            .foregroundStyle(.blue)
                             .accessibilityLabel("録音時間")
                     } else {
                         Text("00:00").font(.system(size: 32, weight: .medium, design: .monospaced))
@@ -115,7 +131,7 @@ struct ContentView: View {
                         Text("咳の音を解析しています").font(.title2)
                         Text("そのまましばらくお待ちください。").foregroundStyle(.secondary)
                     } else if let result = session.result, let score = result.averagePositiveScore {
-                        Text("感染症の可能性スコア").font(.title2)
+                        Text("感染症リスクスコア").font(.title2)
                         ScoreGauge(score: score)
                         Text("解析した咳：\(result.coughCount)回").foregroundStyle(.secondary)
                         Text("この数値はAIモデルの推定スコアです。\n実際の感染確率や診断を示すものではありません。")
@@ -227,7 +243,7 @@ struct ScoreGauge: View {
         .frame(width: 220, height: 220)
         .padding(10)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("感染症の可能性スコア")
+        .accessibilityLabel("感染症リスクスコア")
         .accessibilityValue(score.formatted(.percent.precision(.fractionLength(1))))
     }
 }
