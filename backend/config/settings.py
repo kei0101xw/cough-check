@@ -47,7 +47,7 @@ INSTALLED_APPS = [
 
 COUGH_SEGMENTATION_MODEL_PATH = os.environ.get(
     "COUGH_SEGMENTATION_MODEL_PATH",
-    str(BASE_DIR.parent.parent / "coughs共有用" / "nicholas" / "slideCNN_fold1.keras"),
+    str(BASE_DIR / "models" / "slideCNN_fold1.keras"),
 )
 INFECTION_CLASSIFIER_MODEL_PATH = os.environ.get(
     "INFECTION_CLASSIFIER_MODEL_PATH", str(BASE_DIR / "models" / "infection_classifier.joblib")

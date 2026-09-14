@@ -9,7 +9,7 @@ system `ffmpeg` command. Production images must include ffmpeg.
 
 ## Model setup
 
-The cough detector defaults to the existing `coughs共有用/nicholas/slideCNN_fold1.keras`.
+The cough detector defaults to `models/slideCNN_fold1.keras` inside the backend directory.
 Train the production classifier from the approved labelled CSV:
 
 ```bash
