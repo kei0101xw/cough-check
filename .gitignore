@@ -1,0 +1,34 @@
+# =====================
+# macOS
+# =====================
+.DS_Store
+
+
+# =====================
+# Python / Django
+# =====================
+__pycache__/
+*.py[cod]
+
+.venv/
+venv/
+
+.env
+.env.*
+
+db.sqlite3
+*.sqlite3
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+
+# =====================
+# Xcode / Swift
+# =====================
+xcuserdata/
+*.xcuserstate
+
+DerivedData/
+.build/
